@@ -869,6 +869,7 @@
 						</b:PropertyChangedTrigger>
 					</b:Interaction.Triggers>
 				</Control>
+				<!-- IUI END -->
 
 				<!-- Show all the world tooltips for this player -->
 				<ItemsControl ItemsSource="{Binding CurrentPlayer.WorldTooltips}" ItemTemplate="{StaticResource CommonTooltipTemplate}" x:Name="WorldTooltipContainer" IsHitTestVisible="True">
@@ -882,7 +883,18 @@
 							<Setter Property="Canvas.Left" Value="{Binding Position.X}"/>
 							<Setter Property="Canvas.Top" Value="{Binding Position.Y}"/>
 							<Setter Property="Canvas.ZIndex" Value="1"/>
+							<!-- EWT START -->
+							<!-- Extra Data For Tooltips -->
+							<Setter Property="ls:TooltipExtender.Owner" Value="{Binding DataContext.CurrentPlayer.SelectedCharacter, RelativeSource={RelativeSource AncestorType=ls:UIWidget}}" />
+							<Setter Property="ls:TooltipExtender.Content" Value="{Binding Item}" />
+							<Setter Property="ls:TooltipExtender.IsOpen" Value="True" />
 							<Style.Triggers>
+								<!-- Opacity for containers -->
+								<DataTrigger Value="Empty" Binding="{Binding ContainerState}">
+									<Setter Property="Canvas.ZIndex" Value="0" />
+									<Setter Property="Opacity" Value="0.6" />
+								</DataTrigger>
+								<!-- EWT END -->
 								<Trigger Property="IsMouseOver" Value="True">
 									<Setter Property="Canvas.ZIndex" Value="1000" />
 								</Trigger>
