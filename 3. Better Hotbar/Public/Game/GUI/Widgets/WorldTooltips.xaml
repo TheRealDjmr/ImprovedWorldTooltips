@@ -5,7 +5,6 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ls="clr-namespace:ls;assembly=SharedGUI"
     Template="{StaticResource Hud.Root}">
-
     <ls:UIWidget.ContentTemplate>
         <DataTemplate DataType="{x:Type ls:Widget}">
             <DataTemplate.Resources>
@@ -212,6 +211,12 @@
                                             ls:TextBlockFormatter.SourceText="{Binding Name}"
                                             Visibility="{Binding Name, Converter={StaticResource StringToVisibilityConverter}}" />
                                         <!-- New Extra Info -->
+                                        <TextBlock
+                                            x:Name="ContainerCountTxt"
+                                            FontSize="{StaticResource MediumFontSize}"
+                                            Foreground="{StaticResource TooltipColor.Title}"
+                                            Text="{Binding GameObject.Inventory.Slots.Count, StringFormat=({0})}"
+                                            Visibility="{Binding GameObject.Inventory.Slots.Count, Converter={StaticResource CountToVisibilityConverter}}" />
                                         <Path
                                             x:Name="ExtraInfo"
                                             Width="28"
@@ -802,7 +807,13 @@
                             <Setter TargetName="NameTxt" Property="Foreground" Value="{StaticResource LS_storyColor}" />
                         </DataTrigger>
                         <!-- Containers -->
-                        <DataTrigger Value="Empty" Binding="{Binding ContainerState}">
+                        <DataTrigger Value="NotExplored" Binding="{Binding ContainerState}">
+                            <Setter TargetName="ExtraInfo" Property="Data" Value="{StaticResource ContainerInfoPath}" />
+                            <Setter TargetName="ExtraInfo" Property="Width" Value="16" />
+                            <Setter TargetName="ExtraInfo" Property="Height" Value="16" />
+                            <Setter TargetName="ExtraInfo" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                        <DataTrigger Value="0" Binding="{Binding GameObject.Inventory.Slots.Count}">
                             <Setter TargetName="ExtraInfo" Property="Data" Value="{StaticResource ContainerInfoPath}" />
                             <Setter TargetName="ExtraInfo" Property="StrokeThickness" Value="1" />
                             <Setter TargetName="ExtraInfo" Property="Fill" Value="Transparent" />
@@ -812,17 +823,10 @@
                             <!-- Hide Looted -->
                             <!--<Setter Property="Visibility" Value="Collapsed" />-->
                         </DataTrigger>
-                        <DataTrigger Value="NotExplored" Binding="{Binding ContainerState}">
-                            <Setter TargetName="ExtraInfo" Property="Data" Value="{StaticResource ContainerInfoPath}" />
-                            <Setter TargetName="ExtraInfo" Property="Width" Value="16" />
-                            <Setter TargetName="ExtraInfo" Property="Height" Value="16" />
-                            <Setter TargetName="ExtraInfo" Property="Visibility" Value="Visible" />
-                        </DataTrigger>
                         <!-- EWT END -->
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </DataTemplate.Resources>
-
             <Grid>
                 <!-- IUI START - show all items auto re-toggle -->
                 <!-- Detects mouse movement, if there are no world items listed -->
@@ -867,7 +871,6 @@
                     </b:Interaction.Triggers>
                 </Control>
                 <!-- IUI END -->
-
                 <!-- Show all the world tooltips for this player -->
                 <ItemsControl
                     x:Name="WorldTooltipContainer"
@@ -891,7 +894,7 @@
                             <Setter Property="ls:TooltipExtender.IsOpen" Value="True" />
                             <Style.Triggers>
                                 <!-- Opacity for containers -->
-                                <DataTrigger Value="Empty" Binding="{Binding ContainerState}">
+                                <DataTrigger Value="0" Binding="{Binding GameObject.Inventory.Slots.Count}">
                                     <Setter Property="Canvas.ZIndex" Value="0" />
                                     <Setter Property="Opacity" Value="0.6" />
                                 </DataTrigger>
@@ -903,7 +906,6 @@
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
-
                 <!-- Indicates if "Show all items" is turned on, and scanning when no entries are showing -->
                 <Grid
                     x:Name="SpyglassHolder"
@@ -956,7 +958,6 @@
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
                 </Grid>
-
                 <!-- controls toggle option for both keyboard and controller -->
                 <ls:LSInputBinding
                     BoundEvent="ShowWorldTooltips"

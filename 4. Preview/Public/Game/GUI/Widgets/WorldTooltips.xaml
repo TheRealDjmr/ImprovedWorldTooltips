@@ -23,6 +23,13 @@
                         Storyboard.TargetProperty="Opacity"
                         To="1" />
                 </Storyboard>
+                <Storyboard x:Key="IUIGamepadAnim" AutoReverse="True">
+                    <DoubleAnimation
+                        Duration="0:0:1"
+                        Storyboard.TargetName="GamepadBorder"
+                        Storyboard.TargetProperty="Opacity"
+                        To="0.1" />
+                </Storyboard>
                 <!-- IUI END -->
                 <!-- EWT START -->
                 <!-- Custom Colors -->
@@ -165,9 +172,18 @@
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="MouseEnter">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" CommandParameter="{Binding GameObject}" />
+                                <!-- Container Preview Triggers -->
+                                <b:ChangePropertyAction
+                                    TargetName="PreviewList"
+                                    Value="Visible"
+                                    PropertyName="Visibility" />
                             </b:EventTrigger>
                             <b:EventTrigger EventName="MouseLeave">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" CommandParameter="" />
+                                <b:ChangePropertyAction
+                                    TargetName="PreviewList"
+                                    Value="Collapsed"
+                                    PropertyName="Visibility" />
                             </b:EventTrigger>
                             <b:EventTrigger EventName="MouseLeftButtonUp">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SelectWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" CommandParameter="{Binding GameObject}" />
@@ -228,9 +244,41 @@
                                             Stroke="{StaticResource TooltipColor.Secondary}"
                                             StrokeThickness="0"
                                             Visibility="Collapsed" />
+                                        <!-- Container Preview -->
+                                        <ItemsControl
+                                            x:Name="PreviewList"
+                                            ItemsSource="{Binding GameObject.Inventory.Slots}"
+                                            Visibility="Collapsed">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Viewbox Width="64" Height="64">
+                                                            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Template.InventorySlot}" />
+                                                        </Viewbox>
+                                                        <TextBlock
+                                                            x:Name="PreviewItemName"
+                                                            Grid.Column="1"
+                                                            VerticalAlignment="Center"
+                                                            FontSize="{StaticResource SmallFontSize}"
+                                                            Text="{Binding Object.Name}" />
+                                                        <Path
+                                                            x:Name="PreviewExtraInfo"
+                                                            Grid.Column="2"
+                                                            VerticalAlignment="Center"
+                                                            Fill="{StaticResource TooltipColor.Secondary}"
+                                                            Stretch="Fill"
+                                                            Visibility="Collapsed" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                         <!-- EWT END -->
                                     </StackPanel>
-
                                     <TextBlock
                                         x:Name="DescriptionTxt"
                                         Foreground="{StaticResource TooltipColor.Primary}"
@@ -870,6 +918,54 @@
                         </b:PropertyChangedTrigger>
                     </b:Interaction.Triggers>
                 </Control>
+                <!-- Detects gamepad, if there are no world items listed -->
+                <Control
+                    x:Name="WTCGamepadInputChecker"
+                    Opacity="1.0"
+                    Visibility="Collapsed">
+                    <Control.Template>
+                        <ControlTemplate TargetType="Control">
+                            <Border
+                                x:Name="GamepadBorder"
+                                Width="50"
+                                Height="50"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                Background="Transparent" />
+                        </ControlTemplate>
+                    </Control.Template>
+                    <b:Interaction.Triggers>
+                        <b:DataTrigger Value="True" Binding="{Binding ElementName=WTCGamepadInputChecker, Path=IsVisible}">
+                            <b:ControlStoryboardAction ControlStoryboardOption="Play" Storyboard="{StaticResource IUIGamepadAnim}" />
+                        </b:DataTrigger>
+                        <b:DataTrigger Value="False" Binding="{Binding ElementName=WTCGamepadInputChecker, Path=IsVisible}">
+                            <b:ControlStoryboardAction ControlStoryboardOption="Stop" Storyboard="{Binding ElementName=GamepadBorder,Path=(b:Interaction.Triggers)[0].Actions[0].Storyboard}" />
+                        </b:DataTrigger>
+                        <b:StoryboardCompletedTrigger Storyboard="{StaticResource IUIGamepadAnim}">
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}" />
+                            <b:ChangePropertyAction
+                                TargetName="WTCGamepadInputChecker"
+                                Value="0.5"
+                                PropertyName="Opacity" />
+                        </b:StoryboardCompletedTrigger>
+                        <b:PropertyChangedTrigger Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
+                            <b:Interaction.Behaviors>
+                                <b:ConditionBehavior>
+                                    <b:ConditionalExpression>
+                                        <b:ComparisonCondition
+                                            LeftOperand="{Binding ElementName=WorldTooltipContainer, Path=HasItems}"
+                                            Operator="Equal"
+                                            RightOperand="True" />
+                                    </b:ConditionalExpression>
+                                </b:ConditionBehavior>
+                            </b:Interaction.Behaviors>
+                            <b:ChangePropertyAction
+                                TargetName="WTCGamepadInputChecker"
+                                Value="1.0"
+                                PropertyName="Opacity" />
+                        </b:PropertyChangedTrigger>
+                    </b:Interaction.Triggers>
+                </Control>
                 <!-- IUI END -->
                 <!-- Show all the world tooltips for this player -->
                 <ItemsControl
@@ -925,9 +1021,6 @@
                             Height="120"
                             Source="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_spyglass.png" />
                     </Border>
-                    <b:Interaction.Behaviors>
-                        <ls:LSMouseDragElementBehavior PositionBounds="{Binding WorldBounds}" />
-                    </b:Interaction.Behaviors>
                     <b:Interaction.Triggers>
                         <b:DataTrigger Value="0.5" Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
                             <b:ControlStoryboardAction ControlStoryboardOption="Play" Storyboard="{StaticResource IUIScanningAnim}" />
@@ -1003,6 +1096,46 @@
                 <!-- Enables/disables the mouse or zero item checks in place -->
                 <DataTrigger Value="False" Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}">
                     <Setter TargetName="WTCMouseInputChecker" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="WTCGamepadInputChecker" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <!-- Move and clip Spyglass depending on controller type -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False" Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder" Property="Margin" Value="20,0,0,0" />
+                        <Setter TargetName="SpyglassHolder" Property="Clip">
+                            <Setter.Value>
+                                <!-- Spyglass Rectangle - Keyboard -->
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="True" Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder" Property="Margin" Value="120,0,0,0" />
+                        <Setter TargetName="SpyglassHolder" Property="Clip">
+                            <Setter.Value>
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <DataTrigger Value="Controller" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}">
+                    <Setter TargetName="SpyglassHolder" Property="Margin" Value="0,0,0,0" />
+                    <Setter TargetName="SpyglassHolder" Property="Clip">
+                        <Setter.Value>
+                            <!-- Spyglass Rectangle - Controller -->
+                            <RectangleGeometry Rect="0,85,120,35" />
+                        </Setter.Value>
+                    </Setter>
                 </DataTrigger>
                 <!-- Toggle Visibility and Opacity depending on what stage it's searching for items -->
                 <MultiDataTrigger>
@@ -1034,6 +1167,37 @@
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.Setters>
                         <Setter TargetName="WTCMouseInputChecker" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="SpyglassHolder" Property="Opacity" Value="1.0" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True" Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Controller" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False" Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                        <Condition Value="0.5" Binding="{Binding ElementName=WTCGamepadInputChecker, Path=Opacity}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder" Property="Opacity" Value="0.5" />
+                        <Setter TargetName="WTCGamepadInputChecker" Property="Visibility" Value="Collapsed" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True" Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Controller" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False" Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                        <Condition Value="1.0" Binding="{Binding ElementName=WTCMouseInputChecker, Path=Opacity}" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="WTCGamepadInputChecker" Property="Visibility" Value="Visible" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True" Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Controller" Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="True" Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
                         <Setter TargetName="SpyglassHolder" Property="Opacity" Value="1.0" />
                     </MultiDataTrigger.Setters>
                 </MultiDataTrigger>
