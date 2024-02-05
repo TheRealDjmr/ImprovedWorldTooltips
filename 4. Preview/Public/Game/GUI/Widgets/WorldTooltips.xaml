@@ -286,6 +286,12 @@
                                               Fill="{Binding ElementName=NameTxt, Path=Foreground}"
                                               Stretch="Fill"
                                               Visibility="Collapsed" />
+                                        <TextBlock x:Name="NameTxt"
+                                                   FontSize="{StaticResource MediumFontSize}"
+                                                   Foreground="{StaticResource TooltipColor.Title}"
+                                                   ls:TextBlockFormatter.SourceText="{Binding Name}"
+                                                   Visibility="{Binding Name, Converter={StaticResource StringToVisibilityConverter}}" />
+                                        <!-- New Extra Info -->
                                         <TextBlock FontSize="{StaticResource MediumFontSize}"
                                                    Text=" "
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
@@ -294,12 +300,6 @@
                                                    Foreground="{Binding Foreground, ElementName=NameTxt}"
                                                    Text="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, StringFormat=({0})}"
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
-                                        <!-- New Extra Info -->
-                                        <TextBlock x:Name="ContainerCountTxt"
-                                                   FontSize="{StaticResource MediumFontSize}"
-                                                   Foreground="{StaticResource TooltipColor.Title}"
-                                                   Text="{Binding GameObject.Inventory.Slots.Count, StringFormat=({0})}"
-                                                   Visibility="{Binding GameObject.Inventory.Slots.Count, Converter={StaticResource CountToVisibilityConverter}}" />
                                         <Path x:Name="ExtraInfo"
                                               Width="28"
                                               Height="28"
