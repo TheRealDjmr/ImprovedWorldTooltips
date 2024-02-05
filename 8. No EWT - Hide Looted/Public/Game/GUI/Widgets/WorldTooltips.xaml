@@ -126,12 +126,8 @@
                         </DataTrigger>
                         <DataTrigger Value="Empty"
                                      Binding="{Binding ContainerState}">
-                            <Setter TargetName="ExtraInfo"
-                                    Property="Text"
-                                    Value="{Binding Source='h823595e6g550fg4614gb1ddgdcd323bb4c69',Converter={StaticResource TranslatedStringConverter}, StringFormat='{} - {0}'}" />
-                            <Setter TargetName="ExtraInfo"
-                                    Property="Visibility"
-                                    Value="Visible" />
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
                         </DataTrigger>
                         <DataTrigger Value="NotExplored"
                                      Binding="{Binding ContainerState}">

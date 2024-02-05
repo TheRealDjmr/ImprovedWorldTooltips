@@ -224,10 +224,17 @@
                             <b:EventTrigger EventName="MouseEnter">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
                                                        CommandParameter="{Binding GameObject}" />
+                                <!-- Container Preview Triggers -->
+                                <b:ChangePropertyAction TargetName="PreviewList"
+                                                        Value="Visible"
+                                                        PropertyName="Visibility" />
                             </b:EventTrigger>
                             <b:EventTrigger EventName="MouseLeave">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
                                                        CommandParameter="" />
+                                <b:ChangePropertyAction TargetName="PreviewList"
+                                                        Value="Collapsed"
+                                                        PropertyName="Visibility" />
                             </b:EventTrigger>
                             <b:EventTrigger EventName="MouseLeftButtonUp">
                                 <b:InvokeCommandAction Command="{Binding DataContext.SelectWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
@@ -272,12 +279,6 @@
                                               Fill="{Binding ElementName=NameTxt, Path=Foreground}"
                                               Stretch="Fill"
                                               Visibility="Collapsed" />
-                                        <TextBlock x:Name="NameTxt"
-                                                   FontSize="{StaticResource MediumFontSize}"
-                                                   Foreground="{StaticResource TooltipColor.Title}"
-                                                   ls:TextBlockFormatter.SourceText="{Binding Name}"
-                                                   Visibility="{Binding Name, Converter={StaticResource StringToVisibilityConverter}}" />
-                                        <!-- New Extra Info -->
                                         <TextBlock FontSize="{StaticResource MediumFontSize}"
                                                    Text=" "
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
@@ -286,6 +287,12 @@
                                                    Foreground="{Binding Foreground, ElementName=NameTxt}"
                                                    Text="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, StringFormat=({0})}"
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
+                                        <!-- New Extra Info -->
+                                        <TextBlock x:Name="ContainerCountTxt"
+                                                   FontSize="{StaticResource MediumFontSize}"
+                                                   Foreground="{StaticResource TooltipColor.Title}"
+                                                   Text="{Binding GameObject.Inventory.Slots.Count, StringFormat=({0})}"
+                                                   Visibility="{Binding GameObject.Inventory.Slots.Count, Converter={StaticResource CountToVisibilityConverter}}" />
                                         <Path x:Name="ExtraInfo"
                                               Width="28"
                                               Height="28"
@@ -298,6 +305,33 @@
                                               Visibility="Collapsed" />
                                         <!-- EWT END -->
                                     </StackPanel>
+                                    <!-- Container Preview -->
+                                    <ScrollViewer MaxHeight="256"
+                                                  Visibility="Collapsed"
+                                                  x:Name="PreviewList"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding InventoriesSlots, ElementName=InventoriesMerger}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Viewbox Width="64"
+                                                                 Height="64">
+                                                            <ContentControl Content="{Binding}"
+                                                                            ContentTemplate="{StaticResource Template.InventorySlot}" />
+                                                        </Viewbox>
+                                                        <TextBlock Grid.Column="1"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="{StaticResource SmallFontSize}"
+                                                                   Text="{Binding Object.Name}" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
                                     <TextBlock x:Name="DescriptionTxt"
                                                Foreground="{StaticResource TooltipColor.Primary}"
                                                ls:TextBlockFormatter.SourceText="{Binding Description}"
@@ -1377,8 +1411,8 @@
                 </ItemsControl>
                 <!-- Indicates if "Show all items" is turned on, and scanning when no entries are showing -->
                 <Grid x:Name="SpyglassHolder"
-                      Margin="120,0,0,0"
-                      HorizontalAlignment="Left"
+                      Margin="0,0,-4,205"
+                      HorizontalAlignment="Right"
                       VerticalAlignment="Bottom"
                       Visibility="Collapsed">
                     <Border x:Name="SpyglassBorder"
@@ -1391,9 +1425,6 @@
                                Height="120"
                                Source="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_spyglass.png" />
                     </Border>
-                    <b:Interaction.Behaviors>
-                        <ls:LSMouseDragElementBehavior PositionBounds="{Binding WorldBounds}" />
-                    </b:Interaction.Behaviors>
                     <b:Interaction.Triggers>
                         <b:DataTrigger Value="0.5"
                                        Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
@@ -1472,6 +1503,46 @@
                             Property="Visibility"
                             Value="Collapsed" />
                 </DataTrigger>
+                <!-- Move and clip Spyglass depending on controller type -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="20,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <!-- Spyglass Rectangle - Keyboard -->
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="True"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="120,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
                 <!-- Toggle Visibility and Opacity depending on what stage it's searching for items -->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>

@@ -272,12 +272,6 @@
                                               Fill="{Binding ElementName=NameTxt, Path=Foreground}"
                                               Stretch="Fill"
                                               Visibility="Collapsed" />
-                                        <TextBlock x:Name="NameTxt"
-                                                   FontSize="{StaticResource MediumFontSize}"
-                                                   Foreground="{StaticResource TooltipColor.Title}"
-                                                   ls:TextBlockFormatter.SourceText="{Binding Name}"
-                                                   Visibility="{Binding Name, Converter={StaticResource StringToVisibilityConverter}}" />
-                                        <!-- New Extra Info -->
                                         <TextBlock FontSize="{StaticResource MediumFontSize}"
                                                    Text=" "
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
@@ -286,6 +280,12 @@
                                                    Foreground="{Binding Foreground, ElementName=NameTxt}"
                                                    Text="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, StringFormat=({0})}"
                                                    Visibility="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger, Converter={StaticResource CountToVisibilityConverter}}" />
+                                        <!-- New Extra Info -->
+                                        <TextBlock x:Name="ContainerCountTxt"
+                                                   FontSize="{StaticResource MediumFontSize}"
+                                                   Foreground="{StaticResource TooltipColor.Title}"
+                                                   Text="{Binding GameObject.Inventory.Slots.Count, StringFormat=({0})}"
+                                                   Visibility="{Binding GameObject.Inventory.Slots.Count, Converter={StaticResource CountToVisibilityConverter}}" />
                                         <Path x:Name="ExtraInfo"
                                               Width="28"
                                               Height="28"
@@ -1187,7 +1187,7 @@
                         </DataTrigger>
                         <!-- Mark Books As Read -->
                         <!-- Checkmark -->
-                        <MultiDataTrigger>
+                        <!-- <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Value="Uncommon"
                                            Binding="{Binding Item.Rarity}" />
@@ -1206,15 +1206,15 @@
                             <Setter TargetName="ExtraInfo"
                                     Property="Height"
                                     Value="16" />
-                        </MultiDataTrigger>
+                        </MultiDataTrigger> -->
                         <!-- Hide -->
-                        <!-- <MultiDataTrigger>
+                        <MultiDataTrigger>
 							<MultiDataTrigger.Conditions>
 								<Condition Value="Uncommon" Binding="{Binding Item.Rarity}" />
 								<Condition Value="Book" Binding="{Binding Item.ItemType}" />
 							</MultiDataTrigger.Conditions>
 							<Setter Property="Visibility" Value="Collapsed" />
-						</MultiDataTrigger> -->
+						</MultiDataTrigger>
                         <DataTrigger Value="Rare"
                                      Binding="{Binding Item.Rarity}">
                             <Setter TargetName="NameTxt"
@@ -1269,7 +1269,7 @@
                                     </Condition.Binding>
                                 </Condition>
                             </MultiDataTrigger.Conditions>
-                            <Setter TargetName="ExtraInfo"
+                            <!-- <Setter TargetName="ExtraInfo"
                                     Property="Data"
                                     Value="{StaticResource ContainerInfoPath}" />
                             <Setter TargetName="ExtraInfo"
@@ -1290,10 +1290,10 @@
                             <Setter Property="Opacity"
                                     Value="0.6" />
                             <Setter Property="Canvas.ZIndex"
-                                    Value="0" />
+                                    Value="0" /> -->
                             <!-- Hide Looted -->
-                            <!-- <Setter Property="Visibility"
-                                    Value="Collapsed" /> -->
+                            <Setter Property="Visibility"
+                                    Value="Collapsed" />
                         </MultiDataTrigger>
                         <!-- EWT END -->
                     </DataTemplate.Triggers>
@@ -1377,8 +1377,8 @@
                 </ItemsControl>
                 <!-- Indicates if "Show all items" is turned on, and scanning when no entries are showing -->
                 <Grid x:Name="SpyglassHolder"
-                      Margin="120,0,0,0"
-                      HorizontalAlignment="Left"
+                      Margin="0,0,-4,205"
+                      HorizontalAlignment="Right"
                       VerticalAlignment="Bottom"
                       Visibility="Collapsed">
                     <Border x:Name="SpyglassBorder"
@@ -1391,9 +1391,6 @@
                                Height="120"
                                Source="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_spyglass.png" />
                     </Border>
-                    <b:Interaction.Behaviors>
-                        <ls:LSMouseDragElementBehavior PositionBounds="{Binding WorldBounds}" />
-                    </b:Interaction.Behaviors>
                     <b:Interaction.Triggers>
                         <b:DataTrigger Value="0.5"
                                        Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
@@ -1472,6 +1469,46 @@
                             Property="Visibility"
                             Value="Collapsed" />
                 </DataTrigger>
+                <!-- Move and clip Spyglass depending on controller type -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="20,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <!-- Spyglass Rectangle - Keyboard -->
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="True"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="120,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
                 <!-- Toggle Visibility and Opacity depending on what stage it's searching for items -->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
