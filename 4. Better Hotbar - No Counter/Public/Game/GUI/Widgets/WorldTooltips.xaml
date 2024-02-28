@@ -1,0 +1,1536 @@
+<ls:UIWidget x:Name="WorldTooltips"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:ls="clr-namespace:ls;assembly=SharedGUI"
+             Template="{StaticResource Hud.Root}">
+    <ls:UIWidget.ContentTemplate>
+        <DataTemplate DataType="{x:Type ls:Widget}">
+            <DataTemplate.Resources>
+                <!-- IUI START - Custom animation -->
+                <Storyboard x:Key="IUIScanningAnim"
+                            AutoReverse="True">
+                    <DoubleAnimation Duration="0:0:1"
+                                     Storyboard.TargetName="SpyglassBorder"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0.1" />
+                </Storyboard>
+                <Storyboard x:Key="IUIIdleAnim">
+                    <DoubleAnimation Duration="0:0:0.1"
+                                     Storyboard.TargetName="SpyglassBorder"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="1" />
+                </Storyboard>
+                <!-- IUI END -->
+                <!-- EWT START -->
+                <!-- Custom Colors -->
+                <SolidColorBrush x:Key="SuppliesColor"
+                                 Color="#F5CD9D" />
+                <SolidColorBrush x:Key="ToolsColor"
+                                 Color="#3B8D7F" />
+                <SolidColorBrush x:Key="AlchemyColor"
+                                 Color="#76A52D" />
+                <SolidColorBrush x:Key="BookColor"
+                                 Color="#895C37" />
+                <!-- Icons -->
+                <!-- Camp Supplies -->
+                <ImageBrush x:Key="SuppliesBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_supplies.png" />
+                <!-- Tools -->
+                <ImageBrush x:Key="ToolsBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_tool.png" />
+                <!-- Potions -->
+                <ImageBrush x:Key="PotionsBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_potion.png" />
+                <!-- Grenades -->
+                <ImageBrush x:Key="GrenadesBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_bomb.png" />
+                <!-- Arrows -->
+                <ImageBrush x:Key="ArrowsBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_arrow.png" />
+                <!-- Scrolls -->
+                <ImageBrush x:Key="ScrollsBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_scroll.png" />
+                <!-- Alchemy -->
+                <ImageBrush x:Key="AlchemyBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_alchemy.png" />
+                <!-- Books -->
+                <ImageBrush x:Key="BooksBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_book.png" />
+                <!-- Crime Hand -->
+                <ImageBrush x:Key="HandBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_hand.png" />
+                <!-- Checkmark -->
+                <ImageBrush x:Key="CheckmarkBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_checkmark.png" />
+                <!-- Container Info Circle -->
+                <ImageBrush x:Key="CircleBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_circle.png" />
+                <!-- Empty Container Info Circle -->
+                <ImageBrush x:Key="EmptyCircleBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_empty_circle.png" />
+                <!-- Container Lock -->
+                <ImageBrush x:Key="LockBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_lock.png" />
+                <!-- Armor -->
+                <!-- Breastplates -->
+                <!-- Cloth -->
+                <ImageBrush x:Key="BreastBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_breast.png" />
+                <!-- Light -->
+                <ImageBrush x:Key="LightBreastBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_lightArmour.png" />
+                <!-- Mdeium -->
+                <ImageBrush x:Key="MediumBreastBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_mediumArmour.png" />
+                <!-- Heavy -->
+                <ImageBrush x:Key="HeavyBreastBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_heavyArmour.png" />
+                <!-- Helmets -->
+                <ImageBrush x:Key="HelmBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_helm.png" />
+                <!-- Boots -->
+                <ImageBrush x:Key="BootsBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_boots.png" />
+                <!-- Gloves -->
+                <ImageBrush x:Key="GlovesBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_gloves.png" />
+                <!-- Cloaks -->
+                <ImageBrush x:Key="CloakBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_cloak.png" />
+                <!-- Jewelry -->
+                <!-- Rings -->
+                <ImageBrush x:Key="RingBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_ring.png" />
+                <!-- Amulets -->
+                <ImageBrush x:Key="AmuletBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_amulet.png" />
+                <!-- Camp Clothes -->
+                <ImageBrush x:Key="BodyBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_body.png" />
+                <ImageBrush x:Key="SlippersBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_slippers.png" />
+                <ImageBrush x:Key="UnderwearBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_underwear.png" />
+                <!-- Weapons -->
+                <!-- Martial -->
+                <!-- Flail -->
+                <ImageBrush x:Key="FlailBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_flail.png" />
+                <!-- Morningstar -->
+                <ImageBrush x:Key="MorningstarBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_morningStar.png" />
+                <!-- Rapier -->
+                <ImageBrush x:Key="RapierBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_rapier.png" />
+                <!-- Scimitar -->
+                <ImageBrush x:Key="ScimitarBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_scimitar.png" />
+                <!-- Greatsword -->
+                <ImageBrush x:Key="GreatswordBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_greatSword.png" />
+                <!-- Longsword -->
+                <ImageBrush x:Key="LongswordBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_longSword.png" />
+                <!-- Shortsword -->
+                <ImageBrush x:Key="ShortswordBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_shortSword.png" />
+                <!-- War Pick -->
+                <ImageBrush x:Key="WarpickBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_warPick.png" />
+                <!-- Greataxe -->
+                <ImageBrush x:Key="GreataxeBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_greatAxe.png" />
+                <!-- Handaxe -->
+                <ImageBrush x:Key="HandaxeBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_handAxe.png" />
+                <!-- Battleaxe -->
+                <ImageBrush x:Key="BattleaxeBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_battleAxe.png" />
+                <!-- Trident -->
+                <ImageBrush x:Key="TridentBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_trident.png" />
+                <!-- Light Hammer -->
+                <ImageBrush x:Key="LighthammerBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_lightHammer.png" />
+                <!-- Warhammer -->
+                <ImageBrush x:Key="WarhammerBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_warhammer.png" />
+                <!-- Glaive -->
+                <ImageBrush x:Key="GlaiveBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_glaive.png" />
+                <!-- Halberd -->
+                <ImageBrush x:Key="HalberdBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_halbard.png" />
+                <!-- Maul -->
+                <ImageBrush x:Key="MaulBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_maul.png" />
+                <!-- Pike -->
+                <ImageBrush x:Key="PikeBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_pike.png" />
+                <!-- Hand Crossbow -->
+                <ImageBrush x:Key="HandcrossbowBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_handCrossbow.png" />
+                <!-- Heavy Crossbow -->
+                <ImageBrush x:Key="HeavycrossbowBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_heavyCrossbow.png" />
+                <!-- Light Corssbow -->
+                <ImageBrush x:Key="LightcrossbowBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_lightCrossbow.png" />
+                <!-- Longbow -->
+                <ImageBrush x:Key="LongbowBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_longBow.png" />
+                <!-- Shortbow -->
+                <ImageBrush x:Key="ShortbowBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_shortBow.png" />
+                <!-- Simple -->
+                <!-- Dart -->
+                <ImageBrush x:Key="DartBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_dart.png" />
+                <!-- Club -->
+                <ImageBrush x:Key="ClubBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_club.png" />
+                <!-- Greatclub -->
+                <ImageBrush x:Key="GreatclubBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_greatClub.png" />
+                <!-- Dagger -->
+                <ImageBrush x:Key="DaggerBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_dagger.png" />
+                <!-- Javelin -->
+                <ImageBrush x:Key="JavelinBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_javelin.png" />
+                <!-- Mace -->
+                <ImageBrush x:Key="MaceBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_mace.png" />
+                <!-- Sickle -->
+                <ImageBrush x:Key="SickleBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_sickle.png" />
+                <!-- Sling -->
+                <!-- <ImageBrush x:Key="SlingBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_sling.png" /> -->
+                <!-- Quarterstaff -->
+                <ImageBrush x:Key="QuarterstaffBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_quarterstaff.png" />
+                <!-- Spear -->
+                <ImageBrush x:Key="SpearBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_spear.png" />
+                <!-- Extra -->
+                <!-- Firearms -->
+                <ImageBrush x:Key="GunBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_gun.png" />
+                <!-- Shields -->
+                <ImageBrush x:Key="ShieldBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_shield.png" />
+                <!-- Musical Instruments -->
+                <ImageBrush x:Key="InstrumentBrush"
+                            Stretch="Fill"
+                            ImageSource="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_proficiency_musicalInstruments.png" />
+                <!-- EWT END -->
+                <DataTemplate x:Key="CommonTooltipTemplate">
+                    <Canvas>
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="MouseEnter">
+                                <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
+                                                       CommandParameter="{Binding GameObject}" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="MouseLeave">
+                                <b:InvokeCommandAction Command="{Binding DataContext.SetHoveredWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
+                                                       CommandParameter="" />
+                            </b:EventTrigger>
+                            <b:EventTrigger EventName="MouseLeftButtonUp">
+                                <b:InvokeCommandAction Command="{Binding DataContext.SelectWorldTooltipCommand, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}"
+                                                       CommandParameter="{Binding GameObject}" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                        <b:Interaction.Behaviors>
+                            <ls:InventoriesMergerBehavior x:Name="InventoriesMerger"
+                                                          Inventories="{Binding GameObject.Inventories}" />
+                        </b:Interaction.Behaviors>
+                        <Border Canvas.Left="-512"
+                                Canvas.Top="-128"
+                                Width="1024"
+                                Height="512">
+                            <ls:LSNineSliceImage HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Style="{StaticResource WorldTooltip9Slice}">
+                                <b:Interaction.Behaviors>
+                                    <ls:DragGameObjectBehavior GameObject="{Binding Item}"
+                                                               StartDragOffset="10" />
+                                </b:Interaction.Behaviors>
+                                <StackPanel Margin="6,-4,6,-6"
+                                            VerticalAlignment="Center">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment"
+                                                    Value="Center" />
+                                            <Setter Property="TextAlignment"
+                                                    Value="Center" />
+                                            <Setter Property="FontSize"
+                                                    Value="{StaticResource ScaledMediumFontSize}" />
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <StackPanel HorizontalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <!-- EWT START -->
+                                        <Viewbox Width="32"
+                                                 x:Name="ProfImageHolder"
+                                                 Margin="2,2,4,2"
+                                                 Height="32"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed">
+                                            <Rectangle x:Name="ProfImage"
+                                                       Width="32"
+                                                       Height="32"
+                                                       Fill="{Binding ElementName=NameTxt, Path=Foreground}" />
+                                        </Viewbox>
+                                        <TextBlock x:Name="NameTxt"
+                                                   FontSize="{StaticResource MediumFontSize}"
+                                                   Foreground="{StaticResource TooltipColor.Title}"
+                                                   ls:TextBlockFormatter.SourceText="{Binding Name}"
+                                                   Visibility="{Binding Name, Converter={StaticResource StringToVisibilityConverter}}" />
+                                        <!-- New Extra Info -->
+                                        <Viewbox Width="20"
+                                                 x:Name="ExtraImageHolder"
+                                                 Margin="4,2,2,2"
+                                                 Height="20"
+                                                 VerticalAlignment="Center"
+                                                 Visibility="Collapsed">
+                                            <Rectangle x:Name="ExtraImage"
+                                                       Width="20"
+                                                       Height="20"
+                                                       Fill="{StaticResource TooltipColor.Secondary}" />
+                                        </Viewbox>
+                                        <!-- EWT END -->
+                                    </StackPanel>
+                                    <TextBlock x:Name="DescriptionTxt"
+                                               Foreground="{StaticResource TooltipColor.Primary}"
+                                               ls:TextBlockFormatter.SourceText="{Binding Description}"
+                                               Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
+                                </StackPanel>
+                            </ls:LSNineSliceImage>
+                        </Border>
+                    </Canvas>
+                    <DataTemplate.Triggers>
+                        <!-- EWT START -->
+                        <!-- New Crime Coloring -->
+                        <DataTrigger Value="True"
+                                     Binding="{Binding IsStealing}">
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HandBrush}" />
+                            <Setter TargetName="ExtraImage"
+                                    Property="Fill"
+                                    Value="{StaticResource LS_alertTxtColor}" />
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                        </DataTrigger>
+                        <!-- Camp Supplies -->
+                        <DataTrigger Value="True"
+                                     Binding="{Binding Path=(ls:TooltipExtender.Data).CampSupplies, RelativeSource={RelativeSource Self}, Converter={StaticResource GreaterThanConverter}, ConverterParameter=0}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource SuppliesColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource SuppliesBrush}" />
+                        </DataTrigger>
+                        <!-- Alchemy -->
+                        <DataTrigger Value="IngredientsToExtract"
+                                     Binding="{Binding Item.AlchemyCombinationType}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource AlchemyColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource AlchemyBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="ExtractToSolution"
+                                     Binding="{Binding Item.AlchemyCombinationType}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource AlchemyColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource AlchemyBrush}" />
+                        </DataTrigger>
+                        <!-- Tools -->
+                        <DataTrigger Value="Tool"
+                                     Binding="{Binding Item.ItemType}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Shovel -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="h12dd1bedgec08g4bf7gbd9dg2d70b06856f3" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Disguise Kit -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="h2c18f6e7gbfd3g4258g9c04g98eede055b3e" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Soul Coin -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="h33123e04g11bag4036ga140g0a55ea19e00d" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Soap Bar -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="he34165f0g8a48g45fagb17fg6ebf687f9a28" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Sponge -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="h92f6e5d1g0363g48f7g84a0gdb77fd24dcc6" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Music Box -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EqualConverter}">
+                                    <Binding Converter="{StaticResource ToStringConverter}"
+                                             Path="Item.Name" />
+                                    <Binding Converter="{StaticResource TranslatedStringConverter}"
+                                             Source="he8f194c1gadafg4e16g9730ge707f02ab36a" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ToolsColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ToolsBrush}" />
+                        </DataTrigger>
+                        <!-- Use Types -->
+                        <DataTrigger Value="Potion"
+                                     Binding="{Binding Item.UseType}">
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource PotionsBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Grenade"
+                                     Binding="{Binding Item.UseType}">
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GrenadesBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Arrow"
+                                     Binding="{Binding Item.UseType}">
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ArrowsBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Scroll"
+                                     Binding="{Binding Item.UseType}">
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ScrollsBrush}" />
+                        </DataTrigger>
+                        <!-- Equipment -->
+                        <DataTrigger Value="True"
+                                     Binding="{Binding Item.IsEquipment}">
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                        </DataTrigger>
+                        <!-- No Proficiency -->
+                        <DataTrigger Value="Cloak"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource CloakBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Ring"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource RingBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Ring2"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource RingBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Amulet"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource AmuletBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="VanityBody"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource BodyBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="VanityBoots"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource SlippersBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Underwear"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource UnderwearBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Value="MusicalInstrument"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource InstrumentBrush}" />
+                        </DataTrigger>
+                        <!-- Armor -->
+                        <!-- Helmets -->
+                        <DataTrigger Value="Helmet"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HelmBrush}" />
+                        </DataTrigger>
+                        <!-- BreastPlates -->
+                        <DataTrigger Value="Breast"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource BreastBrush}" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Breast"
+                                           Binding="{Binding Item.EquipmentSlotType}" />
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="LightArmor"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LightBreastBrush}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Breast"
+                                           Binding="{Binding Item.EquipmentSlotType}" />
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="MediumArmor"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource MediumBreastBrush}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Breast"
+                                           Binding="{Binding Item.EquipmentSlotType}" />
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="HeavyArmor"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HeavyBreastBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Boots -->
+                        <DataTrigger Value="Boots"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource BootsBrush}" />
+                        </DataTrigger>
+                        <!-- Gloves -->
+                        <DataTrigger Value="Gloves"
+                                     Binding="{Binding Item.EquipmentSlotType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GlovesBrush}" />
+                        </DataTrigger>
+                        <!-- Weapons -->
+                        <!-- Flail -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Flails"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource FlailBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Morningstar -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Morningstars"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource MorningstarBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Rapier -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Rapiers"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource RapierBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Scimitar -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Scimitars"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ScimitarBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Shortsword -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Shortswords"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ShortswordBrush}" />
+                        </MultiDataTrigger>
+                        <!-- War Pick -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Warpicks"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource WarpickBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Battleaxe -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Battleaxes"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource BattleaxeBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Longsword -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Longswords"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LongswordBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Trident -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Tridents"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource TridentBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Warhammer -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Warhammers"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource WarhammerBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Glaive -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Glaives"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GlaiveBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Greataxe -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Greataxes"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GreataxeBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Greatsword -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Greatswords"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GreatswordBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Halberd -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Halberds"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HalberdBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Maul -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Mauls"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource MaulBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Pike -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Pikes"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource PikeBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Hand Crossbow -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="HandCrossbows"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HandcrossbowBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Heavy Crossbow -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="HeavyCrossbows"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HeavycrossbowBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Longbow -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Longbows"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LongbowBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Dart -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Darts"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource DartBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Club -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Clubs"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ClubBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Dagger -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Daggers"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource DaggerBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Hand Axe -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Handaxes"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource HandaxeBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Javelin -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Javelins"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource JavelinBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Light Hammer -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="LightHammers"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LighthammerBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Mace -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Maces"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource MaceBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Sickle -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Sickles"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource SickleBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Quarterstaff -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Quarterstaffs"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource QuarterstaffBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Spear -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Spears"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource SpearBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Greatclub -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Greatclubs"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GreatclubBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Light Crossbow -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="LightCrossbows"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LightcrossbowBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Shortbow -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Shortbows"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ShortbowBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Firearms -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Proficiency"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].TypeId, RelativeSource={RelativeSource Self}}" />
+                                <Condition Value="Slings"
+                                           Binding="{Binding Path=(ls:TooltipExtender.Data).Properties[0].SubTypeId, RelativeSource={RelativeSource Self}}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource GunBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Shields -->
+                        <DataTrigger Value="Shield"
+                                     Binding="{Binding Item.ItemType}">
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource ShieldBrush}" />
+                        </DataTrigger>
+                        <!-- Rarity -->
+                        <DataTrigger Value="Uncommon"
+                                     Binding="{Binding Item.Rarity}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ItemRarityColour.Uncommon}" />
+                        </DataTrigger>
+                        <!-- Books -->
+                        <DataTrigger Value="Book"
+                                     Binding="{Binding Item.ItemType}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource BookColor}" />
+                            <Setter TargetName="ProfImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ProfImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource BooksBrush}" />
+                        </DataTrigger>
+                        <!-- Mark Books As Read -->
+                        <!-- Checkmark -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="Uncommon"
+                                           Binding="{Binding Item.Rarity}" />
+                                <Condition Value="Book"
+                                           Binding="{Binding Item.ItemType}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource CheckmarkBrush}" />
+                        </MultiDataTrigger>
+                        <DataTrigger Value="Rare"
+                                     Binding="{Binding Item.Rarity}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ItemRarityColour.Rare}" />
+                        </DataTrigger>
+                        <DataTrigger Value="VeryRare"
+                                     Binding="{Binding Item.Rarity}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ItemRarityColour.VeryRare}" />
+                        </DataTrigger>
+                        <DataTrigger Value="Legendary"
+                                     Binding="{Binding Item.Rarity}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource ItemRarityColour.Legendary}" />
+                        </DataTrigger>
+                        <DataTrigger Value="True"
+                                     Binding="{Binding Item.IsStoryItem}">
+                            <Setter TargetName="NameTxt"
+                                    Property="Foreground"
+                                    Value="{StaticResource LS_storyColor}" />
+                        </DataTrigger>
+                        <!-- Containers -->
+                        <!-- Initial State -->
+                        <DataTrigger Value="NotExplored"
+                                     Binding="{Binding ContainerState}">
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource CircleBrush}" />
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                        </DataTrigger>
+                        <!-- Lock Icon -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="True"
+                                           Binding="{Binding GameObject.IsContainer}" />
+                                <Condition Value="0"
+                                           Binding="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger}" />
+                                <Condition Value="True"
+                                           Binding="{Binding GameObject.LootInventory.Slots.Count, Converter={StaticResource GreaterThanConverter}, ConverterParameter=0}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource LockBrush}" />
+                        </MultiDataTrigger>
+                        <!-- Actual Containers -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="0"
+                                           Binding="{Binding GameObject.LootInventory.Slots.Count}" />
+                                <Condition Value="True"
+                                           Binding="{Binding GameObject.IsContainer}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource EmptyCirleBrush}" />
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource EmptyCircleBrush}" />
+                            <Setter Property="Opacity"
+                                    Value="0.6" />
+                            <Setter Property="Canvas.ZIndex"
+                                    Value="0" />
+                        </MultiDataTrigger>
+                        <!-- Corpses -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="0"
+                                           Binding="{Binding InventoriesSlots.Count, ElementName=InventoriesMerger}" />
+                                <Condition Value="Character"
+                                           Binding="{Binding GameObject.Type}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource EmptyCircleBrush}" />
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource EmptyCircleBrush}" />
+                            <Setter Property="Opacity"
+                                    Value="0.6" />
+                            <Setter Property="Canvas.ZIndex"
+                                    Value="0" />
+                        </MultiDataTrigger>
+                        <!-- An additional check with the default logic -->
+                        <DataTrigger Value="Empty"
+                                     Binding="{Binding ContainerState}">
+                            <Setter TargetName="ExtraImage"
+                                    Property="OpacityMask"
+                                    Value="{StaticResource EmptyCircleBrush}" />
+                            <Setter TargetName="ExtraImageHolder"
+                                    Property="Visibility"
+                                    Value="Visible" />
+                        </DataTrigger>
+                        <!-- EWT END -->
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </DataTemplate.Resources>
+            <Grid>
+                <!-- IUI START - show all items auto re-toggle -->
+                <!-- Detects mouse movement, if there are no world items listed -->
+                <Control x:Name="WTCMouseInputChecker"
+                         Opacity="1.0"
+                         Visibility="Collapsed">
+                    <Control.Template>
+                        <ControlTemplate TargetType="Control">
+                            <Border Width="3840"
+                                    Height="2160"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent" />
+                        </ControlTemplate>
+                    </Control.Template>
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="MouseEnter">
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}" />
+                            <b:ChangePropertyAction TargetName="WTCMouseInputChecker"
+                                                    Value="0.5"
+                                                    PropertyName="Opacity" />
+                        </b:EventTrigger>
+                        <b:PropertyChangedTrigger Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
+                            <b:Interaction.Behaviors>
+                                <b:ConditionBehavior>
+                                    <b:ConditionalExpression>
+                                        <b:ComparisonCondition LeftOperand="{Binding ElementName=WorldTooltipContainer, Path=HasItems}"
+                                                               Operator="Equal"
+                                                               RightOperand="True" />
+                                    </b:ConditionalExpression>
+                                </b:ConditionBehavior>
+                            </b:Interaction.Behaviors>
+                            <b:ChangePropertyAction TargetName="WTCMouseInputChecker"
+                                                    Value="1.0"
+                                                    PropertyName="Opacity" />
+                        </b:PropertyChangedTrigger>
+                    </b:Interaction.Triggers>
+                </Control>
+                <!-- IUI END -->
+                <!-- Show all the world tooltips for this player -->
+                <ItemsControl x:Name="WorldTooltipContainer"
+                              IsHitTestVisible="True"
+                              ItemsSource="{Binding CurrentPlayer.WorldTooltips}"
+                              ItemTemplate="{StaticResource CommonTooltipTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ls:LSWorldTooltipsCanvas ClipToBounds="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left"
+                                    Value="{Binding Position.X}" />
+                            <Setter Property="Canvas.Top"
+                                    Value="{Binding Position.Y}" />
+                            <Setter Property="Canvas.ZIndex"
+                                    Value="1" />
+                            <!-- EWT START -->
+                            <!-- Extra Data For Tooltips -->
+                            <Setter Property="ls:TooltipExtender.Owner"
+                                    Value="{Binding DataContext.CurrentPlayer.SelectedCharacter, RelativeSource={RelativeSource AncestorType=ls:UIWidget}}" />
+                            <Setter Property="ls:TooltipExtender.Content"
+                                    Value="{Binding Item}" />
+                            <Setter Property="ls:TooltipExtender.IsOpen"
+                                    Value="True" />
+                            <!-- EWT END -->
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter Property="Canvas.ZIndex"
+                                            Value="1000" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+                <!-- Indicates if "Show all items" is turned on, and scanning when no entries are showing -->
+                <Grid x:Name="SpyglassHolder"
+                      Margin="0,0,-4,205"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Bottom"
+                      Visibility="Collapsed">
+                    <Border x:Name="SpyglassBorder"
+                            Width="120"
+                            Height="120"
+                            Background="Transparent"
+                            Opacity="1">
+                        <Image x:Name="IconSpyglass"
+                               Width="120"
+                               Height="120"
+                               Source="pack://application:,,,/GustavNoesisGUI;component/Assets/HUD/ico_spyglass.png" />
+                    </Border>
+                    <b:Interaction.Triggers>
+                        <b:DataTrigger Value="0.5"
+                                       Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
+                            <b:ControlStoryboardAction ControlStoryboardOption="Play"
+                                                       Storyboard="{StaticResource IUIScanningAnim}" />
+                        </b:DataTrigger>
+                        <b:DataTrigger Value="1"
+                                       Binding="{Binding ElementName=SpyglassHolder, Path=Opacity}">
+                            <b:ControlStoryboardAction ControlStoryboardOption="Stop"
+                                                       Storyboard="{Binding ElementName=SpyglassHolder,Path=(b:Interaction.Triggers)[0].Actions[0].Storyboard}" />
+                            <b:ChangePropertyAction TargetName="SpyglassBorder"
+                                                    Value="1"
+                                                    PropertyName="Opacity" />
+                        </b:DataTrigger>
+                        <b:StoryboardCompletedTrigger Storyboard="{StaticResource IUIScanningAnim}">
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}" />
+                            <b:ControlStoryboardAction ControlStoryboardOption="Play"
+                                                       Storyboard="{StaticResource IUIIdleAnim}" />
+                        </b:StoryboardCompletedTrigger>
+                        <b:StoryboardCompletedTrigger Storyboard="{StaticResource IUIIdleAnim}">
+                            <b:Interaction.Behaviors>
+                                <b:ConditionBehavior>
+                                    <b:ConditionalExpression>
+                                        <b:ComparisonCondition LeftOperand="{Binding ElementName=SpyglassHolder, Path=Opacity}"
+                                                               Operator="Equal"
+                                                               RightOperand="0.5" />
+                                    </b:ConditionalExpression>
+                                </b:ConditionBehavior>
+                            </b:Interaction.Behaviors>
+                            <b:ControlStoryboardAction ControlStoryboardOption="Play"
+                                                       Storyboard="{StaticResource IUIScanningAnim}" />
+                        </b:StoryboardCompletedTrigger>
+                        <b:EventTrigger EventName="MouseEnter">
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </Grid>
+                <!-- controls toggle option for both keyboard and controller -->
+                <ls:LSInputBinding BoundEvent="ShowWorldTooltips"
+                                   EatInput="True"
+                                   IsEnabled="{Binding ElementName=SpyglassHolder, Path=IsVisible}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="LSInputBindingPressed">
+                            <b:ChangePropertyAction TargetName="WorldTooltipContainer"
+                                                    Value="Collapsed"
+                                                    PropertyName="Visibility" />
+                            <b:ChangePropertyAction TargetName="SpyglassHolder"
+                                                    Value="Collapsed"
+                                                    PropertyName="Visibility" />
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}"
+                                                   CommandParameter="{StaticResource FalseValue}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ls:LSInputBinding>
+                <ls:LSInputBinding BoundEvent="ShowWorldTooltips"
+                                   EatInput="True"
+                                   IsEnabled="{Binding ElementName=SpyglassHolder, Path=IsVisible, Converter={StaticResource InvertBoolConverter}}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="LSInputBindingPressed">
+                            <b:ChangePropertyAction TargetName="WorldTooltipContainer"
+                                                    Value="Visible"
+                                                    PropertyName="Visibility" />
+                            <b:ChangePropertyAction TargetName="SpyglassHolder"
+                                                    Value="Visible"
+                                                    PropertyName="Visibility" />
+                            <b:InvokeCommandAction Command="{Binding SetShowWorldTooltipsCommand}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ls:LSInputBinding>
+            </Grid>
+            <DataTemplate.Triggers>
+                <!-- Enables/disables the mouse or zero item checks in place -->
+                <DataTrigger Value="False"
+                             Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}">
+                    <Setter TargetName="WTCMouseInputChecker"
+                            Property="Visibility"
+                            Value="Collapsed" />
+                </DataTrigger>
+                <!-- Move and clip Spyglass depending on controller type -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="20,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <!-- Spyglass Rectangle - Keyboard -->
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="True"
+                                   Binding="{Binding CurrentPlayer.SelectedCharacter.IsInCamp}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Margin"
+                                Value="120,0,0,0" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Clip">
+                            <Setter.Value>
+                                <RectangleGeometry Rect="0,0,120,120" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <!-- Toggle Visibility and Opacity depending on what stage it's searching for items -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True"
+                                   Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False"
+                                   Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                        <Condition Value="0.5"
+                                   Binding="{Binding ElementName=WTCMouseInputChecker, Path=Opacity}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Opacity"
+                                Value="0.5" />
+                        <Setter TargetName="WTCMouseInputChecker"
+                                Property="Visibility"
+                                Value="Collapsed" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True"
+                                   Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                        <Condition Value="False"
+                                   Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                        <Condition Value="1.0"
+                                   Binding="{Binding ElementName=WTCMouseInputChecker, Path=Opacity}" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="WTCMouseInputChecker"
+                            Property="Visibility"
+                            Value="Visible" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True"
+                                   Binding="{Binding ElementName=WorldTooltipContainer, Path=HasItems}" />
+                        <Condition Value="True"
+                                   Binding="{Binding ElementName=SpyglassHolder, Path=IsVisible}" />
+                        <Condition Value="Keyboard"
+                                   Binding="{Binding DataContext.Data.UIInputMethod, RelativeSource={RelativeSource AncestorType={x:Type ls:UIWidget}}}" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="WTCMouseInputChecker"
+                                Property="Visibility"
+                                Value="Collapsed" />
+                        <Setter TargetName="SpyglassHolder"
+                                Property="Opacity"
+                                Value="1.0" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </ls:UIWidget.ContentTemplate>
+    <!-- IUI END -->
+</ls:UIWidget>
